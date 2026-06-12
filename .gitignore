@@ -216,3 +216,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific outputs
+outputs/
+data/outputs/
+*.pdb
+*.cif
+*.mmcif
+*.pt
+*.pth
+*.npy
+*.npz
+*.csv
+
+# Hugging Face / model caches
+huggingface/
+hf_cache/
+.cache/
