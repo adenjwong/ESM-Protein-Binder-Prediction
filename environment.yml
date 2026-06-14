@@ -1,0 +1,18 @@
+name: esm-binder
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas
+  - biopython
+  - matplotlib
+  - jupyter
+  - ipykernel
+  - pip:
+      - torch
+      - huggingface_hub
+      - accelerate
+      - safetensors
+      - esm@git+https://github.com/Biohub/esm.git@main
