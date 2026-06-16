@@ -1,5 +1,6 @@
 name: esm-binder
 channels:
+  - pytorch
   - conda-forge
 dependencies:
   - python=3.12
@@ -10,8 +11,10 @@ dependencies:
   - matplotlib
   - jupyter
   - ipykernel
+  - pytorch
+  - torchvision
+  - torchaudio
   - pip:
-      - torch
       - huggingface_hub
       - accelerate
       - safetensors
