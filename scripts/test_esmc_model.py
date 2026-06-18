@@ -1,3 +1,9 @@
+from pathlib import Path
+
+import numpy as np
+import torch
+from transformers import AutoModelForMaskedLM, AutoTokenizer
+
 from src.fasta import load_fasta_sequence
 
 
@@ -5,12 +11,13 @@ def main():
     print("Testing ESMC model loading and inference...")
     print()
 
-    import torch
-    from transformers import AutoModelForMaskedLM, AutoTokenizer
-
     model_name = "biohub/ESMC-6B"
+    fasta_path = "data/sequences/chain_a.fasta"
 
-    header, sequence = load_fasta_sequence("data/sequences/chain_a.fasta")
+    output_dir = Path("outputs/esmc_embeddings")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    header, sequence = load_fasta_sequence(fasta_path)
 
     print("Loaded sequence:")
     print("Header:", header)
@@ -44,14 +51,33 @@ def main():
     print()
     print("Inference completed successfully.")
 
-    if hasattr(output, "logits"):
-        print("Logits shape:", tuple(output.logits.shape))
+    logits = output.logits.detach().float().cpu().numpy()
+    hidden_states = output.last_hidden_state.detach().float().cpu().numpy()
 
-    if hasattr(output, "hidden_states") and output.hidden_states is not None:
-        print("Hidden states:", len(output.hidden_states))
+    print("Logits shape:", logits.shape)
+    print("Last hidden state shape:", hidden_states.shape)
 
-    if hasattr(output, "last_hidden_state"):
-        print("Last hidden state shape:", tuple(output.last_hidden_state.shape))
+    token_embeddings = hidden_states[0]
+
+    residue_embeddings = token_embeddings[1 : len(sequence) + 1]
+
+    protein_embedding = residue_embeddings.mean(axis=0)
+
+    token_embedding_path = output_dir / f"{header}_token_embeddings.npy"
+    protein_embedding_path = output_dir / f"{header}_protein_embedding.npy"
+
+    np.save(token_embedding_path, residue_embeddings)
+    np.save(protein_embedding_path, protein_embedding)
+
+    print()
+    print("Saved residue-level embeddings to:")
+    print(token_embedding_path)
+    print("Shape:", residue_embeddings.shape)
+
+    print()
+    print("Saved protein-level embedding to:")
+    print(protein_embedding_path)
+    print("Shape:", protein_embedding.shape)
 
 
 if __name__ == "__main__":
