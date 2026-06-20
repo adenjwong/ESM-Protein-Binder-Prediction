@@ -60,6 +60,9 @@ def predict_structure(
     if device == "cuda":
         model = model.cuda()
     elif device == "mps":
+        # ESMFold2 mostly runs on Apple Silicon MPS, but some PyTorch ops are not
+        # implemented on MPS yet. Run with PYTORCH_ENABLE_MPS_FALLBACK=1 so those
+        # unsupported ops can fall back to CPU instead of crashing.
         model = model.to("mps")
     else:
         model = model.cpu()
