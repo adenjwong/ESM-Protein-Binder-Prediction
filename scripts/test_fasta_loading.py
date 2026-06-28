@@ -1,20 +1,54 @@
+from argparse import ArgumentParser
+from pathlib import Path
+
 from src.fasta import load_fasta_sequence
 
 
+def test_fasta_loading(fasta_paths: list[str | Path], show_sequence: bool = False) -> None:
+    for fasta_path in fasta_paths:
+        fasta_path = Path(fasta_path)
+
+        print("=" * 80)
+        print("FASTA:", fasta_path)
+
+        header, sequence = load_fasta_sequence(fasta_path)
+
+        print("Header:", header)
+        print("Length:", len(sequence))
+
+        if show_sequence:
+            print("Sequence:", sequence)
+
+        print()
+
+
+def parse_args():
+    parser = ArgumentParser(
+        description="Test loading one or more protein FASTA files."
+    )
+
+    parser.add_argument(
+        "fastas",
+        nargs="+",
+        help="One or more FASTA files to load.",
+    )
+
+    parser.add_argument(
+        "--show-sequence",
+        action="store_true",
+        help="Print the full protein sequence.",
+    )
+
+    return parser.parse_args()
+
+
 def main():
-    chain_a_header, chain_a_sequence = load_fasta_sequence("data/sequences/chain_a.fasta")
-    chain_b_header, chain_b_sequence = load_fasta_sequence("data/sequences/chain_b.fasta")
+    args = parse_args()
 
-    print("Loaded Chain A")
-    print("Header:", chain_a_header)
-    print("Length:", len(chain_a_sequence))
-    print("Sequence:", chain_a_sequence)
-    print()
-
-    print("Loaded Chain B")
-    print("Header:", chain_b_header)
-    print("Length:", len(chain_b_sequence))
-    print("Sequence:", chain_b_sequence)
+    test_fasta_loading(
+        fasta_paths=args.fastas,
+        show_sequence=args.show_sequence,
+    )
 
 
 if __name__ == "__main__":
